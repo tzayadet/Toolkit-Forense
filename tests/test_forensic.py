@@ -1,5 +1,4 @@
 import hashlib
-import os
 import tempfile
 import unittest
 from types import SimpleNamespace
@@ -44,31 +43,16 @@ class ForensicTests(unittest.TestCase):
 
     @patch("forensic_inventory.os.fstat")
     def test_hash_file_discards_digest_if_file_changes_during_read(self, mocked_fstat):
-        with tempfile.TemporaryDirectory() as tmp:
-            path = Path(tmp) / "changing.bin"
-            path.write_bytes(b"evidence")
-            stable = SimpleNamespace(
-                st_dev=1, st_ino=2, st_size=8, st_mtime_ns=100, st_ctime_ns=100
-            )
-            changed = SimpleNamespace(
-                st_dev=1, st_ino=2, st_size=9, st_mtime_ns=200, st_ctime_ns=200
-            )
-            real_fstat = os.fstat
-            calls = 0
+        stable = SimpleNamespace(
+            st_dev=1, st_ino=2, st_size=8, st_mtime_ns=100, st_ctime_ns=100
+        )
+        changed = SimpleNamespace(
+            st_dev=1, st_ino=2, st_size=9, st_mtime_ns=200, st_ctime_ns=200
+        )
+        mocked_fstat.side_effect = [stable, changed]
 
-            def controlled_fstat(fd):
-                nonlocal calls
-                calls += 1
-                if calls == 1:
-                    return stable
-                if calls == 2:
-                    return changed
-                return real_fstat(fd)
-
-            mocked_fstat.side_effect = controlled_fstat
-
-            with self.assertRaisesRegex(OSError, "changed while hashing"):
-                hash_file(path)
+        with self.assertRaisesRegex(OSError, "changed while hashing"):
+            hash_file(Path(__file__))
 
     @patch("forensic_inventory.hash_file", side_effect=OSError("simulated read failure"))
     def test_scan_records_hashing_errors_without_aborting(self, _hash_file):
