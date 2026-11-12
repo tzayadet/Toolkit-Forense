@@ -5,7 +5,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 RUN useradd --create-home --uid 10001 appuser
-COPY --chown=appuser:appuser forensic.py .
+COPY --chown=appuser:appuser forensic_inventory.py .
 USER appuser
 
 ENTRYPOINT ["python", "forensic.py"]
