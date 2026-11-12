@@ -1,4 +1,5 @@
 import hashlib
+import os
 import tempfile
 import unittest
 from types import SimpleNamespace
@@ -52,7 +53,19 @@ class ForensicTests(unittest.TestCase):
             changed = SimpleNamespace(
                 st_dev=1, st_ino=2, st_size=9, st_mtime_ns=200, st_ctime_ns=200
             )
-            mocked_fstat.side_effect = [stable, changed]
+            real_fstat = os.fstat
+            calls = 0
+
+            def controlled_fstat(fd):
+                nonlocal calls
+                calls += 1
+                if calls == 1:
+                    return stable
+                if calls == 2:
+                    return changed
+                return real_fstat(fd)
+
+            mocked_fstat.side_effect = controlled_fstat
 
             with self.assertRaisesRegex(OSError, "changed while hashing"):
                 hash_file(path)
