@@ -56,6 +56,6 @@ Consulta [LICENSE](LICENSE).
 
 ## Project showcase
 
-Static overview with a fictional inventory record: https://tzayadet.github.io/Toolkit-Forense/
+Showcase source: `docs/index.html` (fictional inventory only). GitHub Pages deployment is pending repository-level Pages activation.
 
 The page does not process evidence. The CLI inventories files and calculates SHA-256 hashes; it does not acquire evidence or establish chain of custody.
