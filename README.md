@@ -1,12 +1,13 @@
 # Forensic Toolkit
 
-Utilidad de inventario básico para análisis de archivos: recorre un directorio, calcula SHA-256 y registra tamaño y fecha de modificación.
+Utilidad de inventario de archivos para análisis técnico: recorre un directorio, calcula SHA-256 y registra tamaño y fecha de modificación en UTC.
 
 ## Requisitos
 
-Python 3.10+. No requiere dependencias externas.
+- Python 3.10 o superior.
+- Sin dependencias externas.
 
-## Uso
+## Uso local
 
 ```bash
 python forensic.py /ruta/a/la/copia-forense
@@ -15,13 +16,32 @@ python forensic.py /ruta/a/la/copia-forense --ext pdf
 
 La salida se genera en JSON e incluye la ruta, el tamaño, la fecha de modificación UTC y el hash SHA-256. Los errores de lectura se registran por archivo.
 
+## Docker
+
+Construye la imagen:
+
+```bash
+docker build -t forensic-toolkit .
+```
+
+Monta la copia de trabajo en modo solo lectura:
+
+```bash
+docker run --rm \
+  -v "/ruta/a/la/copia-forense:/evidence:ro" \
+  forensic-toolkit /evidence
+```
+
+La imagen ejecuta la utilidad como usuario sin privilegios. La salida JSON se escribe en stdout.
+
 ## Consideraciones forenses
 
 - Trabaja sobre copias verificadas, no sobre la evidencia original.
 - Monta los soportes en modo solo lectura cuando sea posible.
 - Documenta adquisición, custodios, fechas, herramientas y versiones.
 - Este script no realiza adquisición forense, bloqueo de escritura ni preservación de cadena de custodia.
-- Los metadatos de creación dependen del sistema de archivos y no se incluyen como fecha probatoria.
+- Los metadatos de modificación dependen del sistema de archivos y no se incluyen como fecha probatoria.
+- Un hash permite comprobar integridad respecto a una referencia, pero no acredita por sí solo la autenticidad ni la cadena de custodia.
 
 ## Licencia
 
