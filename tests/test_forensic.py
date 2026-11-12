@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from forensic import hash_file, scan_dir
+from forensic_inventory import hash_file, scan_dir
 
 
 class ForensicTests(unittest.TestCase):
@@ -25,6 +25,20 @@ class ForensicTests(unittest.TestCase):
             self.assertEqual(len(records), 2)
             self.assertTrue(all("sha256" in record for record in records))
             self.assertTrue(all("modified_utc" in record for record in records))
+
+    def test_scan_skips_symbolic_links(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "evidence"
+            root.mkdir()
+            outside = Path(tmp) / "outside.txt"
+            outside.write_text("outside evidence", encoding="utf-8")
+            link = root / "linked.txt"
+            try:
+                link.symlink_to(outside)
+            except (OSError, NotImplementedError):
+                self.skipTest("Symbolic links are not available in this environment")
+
+            self.assertEqual(scan_dir(root), [])
 
     def test_extension_filter_is_applied(self):
         with tempfile.TemporaryDirectory() as tmp:
