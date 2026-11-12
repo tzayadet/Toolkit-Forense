@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -18,8 +19,15 @@ def hash_file(path: Path) -> str:
         raise ValueError("Refusing to hash a symbolic link")
     digest = hashlib.sha256()
     with path.open("rb") as handle:
+        before = os.fstat(handle.fileno())
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
+        after = os.fstat(handle.fileno())
+
+    identity_before = (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns, before.st_ctime_ns)
+    identity_after = (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns, after.st_ctime_ns)
+    if identity_before != identity_after:
+        raise OSError("File changed while hashing; digest discarded")
     return digest.hexdigest()
 
 
@@ -45,12 +53,18 @@ def scan_dir(root: Path, extension: str | None = None) -> list[dict]:
             if path.suffix.lower() != expected_suffix:
                 continue
         try:
-            stat = path.stat()
+            stat_before = path.stat()
+            digest = hash_file(path)
+            stat_after = path.stat()
+            identity_before = (stat_before.st_dev, stat_before.st_ino, stat_before.st_size, stat_before.st_mtime_ns, stat_before.st_ctime_ns)
+            identity_after = (stat_after.st_dev, stat_after.st_ino, stat_after.st_size, stat_after.st_mtime_ns, stat_after.st_ctime_ns)
+            if identity_before != identity_after:
+                raise OSError("File changed during inventory; record discarded")
             records.append({
                 "path": str(path),
-                "size": stat.st_size,
-                "modified_utc": datetime.fromtimestamp(stat.st_mtime, timezone.utc).isoformat(),
-                "sha256": hash_file(path),
+                "size": stat_after.st_size,
+                "modified_utc": datetime.fromtimestamp(stat_after.st_mtime, timezone.utc).isoformat(),
+                "sha256": digest,
             })
         except OSError as exc:
             records.append({"path": str(path), "error": f"{type(exc).__name__}: {exc}"})
