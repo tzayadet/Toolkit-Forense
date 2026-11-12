@@ -26,6 +26,19 @@ class ForensicTests(unittest.TestCase):
             self.assertTrue(all("sha256" in record for record in records))
             self.assertTrue(all("modified_utc" in record for record in records))
 
+    def test_hash_file_rejects_symbolic_links(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            outside = Path(tmp) / "outside.txt"
+            outside.write_text("outside evidence", encoding="utf-8")
+            link = Path(tmp) / "linked.txt"
+            try:
+                link.symlink_to(outside)
+            except (OSError, NotImplementedError):
+                self.skipTest("Symbolic links are not available in this environment")
+
+            with self.assertRaisesRegex(ValueError, "symbolic link"):
+                hash_file(link)
+
     def test_scan_skips_symbolic_links(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp) / "evidence"
