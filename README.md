@@ -13,7 +13,7 @@ Utilidad de inventario de archivos para análisis técnico: recorre un directori
 
 ```bash
 python forensic_inventory.py /ruta/a/la/copia-forense
-python forensic.py /ruta/a/la/copia-forense --ext pdf
+python forensic_inventory.py /ruta/a/la/copia-forense --ext pdf
 ```
 
 La salida se genera en JSON e incluye la ruta, el tamaño, la fecha de modificación UTC y el hash SHA-256. Los errores de lectura se registran por archivo. Se excluyen enlaces simbólicos para evitar seguir rutas que salgan de la copia seleccionada.
