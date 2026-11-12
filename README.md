@@ -36,9 +36,15 @@ docker run --rm \
 
 La imagen ejecuta la utilidad como usuario sin privilegios. La salida JSON se escribe en stdout.
 
-## Publicación de la demo
+## Publicar el showcase
 
-La demo está preparada en `docs/index.html` y utiliza únicamente datos ficticios. Para publicarla, activa GitHub Pages en **Settings → Pages → Build and deployment → Source → GitHub Actions** y crea la variable de repositorio `ENABLE_PAGES=true` en **Settings → Secrets and variables → Actions → Variables**. El workflow no se ejecuta hasta que Pages esté configurado.
+La demo estática está en [docs/index.html](docs/index.html) y utiliza únicamente datos ficticios. Para publicarla:
+
+1. En **Settings → Pages**, selecciona **GitHub Actions** como origen.
+2. En **Settings → Secrets and variables → Actions → Variables**, crea `ENABLE_PAGES` con valor `true`.
+3. Ejecuta **Deploy Toolkit-Forense showcase to GitHub Pages** desde Actions.
+
+La página no procesa evidencias. El CLI inventaría archivos y calcula SHA-256; no realiza adquisición forense ni establece cadena de custodia.
 
 ## Consideraciones forenses
 
@@ -52,10 +58,3 @@ La demo está preparada en `docs/index.html` y utiliza únicamente datos fictici
 ## Licencia
 
 Consulta [LICENSE](LICENSE).
-
-
-## Project showcase
-
-Showcase source: `docs/index.html` (fictional inventory only). GitHub Pages deployment is pending repository-level Pages activation.
-
-The page does not process evidence. The CLI inventories files and calculates SHA-256 hashes; it does not acquire evidence or establish chain of custody.
