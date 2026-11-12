@@ -1,6 +1,8 @@
-# Forensic Toolkit
+# Forensic File Integrity
 
 Utilidad de inventario de archivos para análisis técnico: recorre un directorio, calcula SHA-256 y registra tamaño y fecha de modificación en UTC.
+
+[![Python tests](https://github.com/tzayadet/Toolkit-Forense/actions/workflows/tests.yml/badge.svg)](https://github.com/tzayadet/Toolkit-Forense/actions/workflows/tests.yml) · [![Container build](https://github.com/tzayadet/Toolkit-Forense/actions/workflows/container-build.yml/badge.svg)](https://github.com/tzayadet/Toolkit-Forense/actions/workflows/container-build.yml)
 
 ## Requisitos
 
@@ -10,11 +12,11 @@ Utilidad de inventario de archivos para análisis técnico: recorre un directori
 ## Uso local
 
 ```bash
-python forensic.py /ruta/a/la/copia-forense
+python forensic_inventory.py /ruta/a/la/copia-forense
 python forensic.py /ruta/a/la/copia-forense --ext pdf
 ```
 
-La salida se genera en JSON e incluye la ruta, el tamaño, la fecha de modificación UTC y el hash SHA-256. Los errores de lectura se registran por archivo.
+La salida se genera en JSON e incluye la ruta, el tamaño, la fecha de modificación UTC y el hash SHA-256. Los errores de lectura se registran por archivo. Se excluyen enlaces simbólicos para evitar seguir rutas que salgan de la copia seleccionada.
 
 ## Docker
 
