@@ -47,7 +47,7 @@ The container runs the inventory against a read-only mount. JSON results are wri
 
 ## Showcase
 
-The showcase source is available in [docs/index.html](docs/index.html). Its records are illustrative; the page does not access local files or process evidence. GitHub Pages is not currently confirmed as published for this repository.
+The showcase source is available in [docs/index.html](docs/index.html). Its records are illustrative; the page does not access local files or process evidence. The deployment workflow is ready; GitHub Pages must first be enabled in repository settings with GitHub Actions as the source.
 
 ## Forensic considerations
 
