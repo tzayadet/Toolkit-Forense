@@ -15,6 +15,8 @@ from pathlib import Path
 
 
 def hash_file(path: Path) -> str:
+    if path.is_symlink():
+        raise ValueError("Refusing to hash a symbolic link")
     digest = hashlib.sha256()
     with path.open("rb") as handle:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
@@ -59,8 +61,8 @@ def main() -> int:
     parser.add_argument("path", type=Path)
     parser.add_argument("-e", "--ext", help="Optional extension filter, e.g. pdf")
     args = parser.parse_args()
-    if not args.path.is_dir():
-        parser.error(f"not a directory: {args.path}")
+    if args.path.is_symlink() or not args.path.is_dir():
+        parser.error(f"not a valid evidence directory (symbolic links are not accepted): {args.path}")
     print(json.dumps(scan_dir(args.path, args.ext), indent=2, ensure_ascii=False))
     return 0
 
