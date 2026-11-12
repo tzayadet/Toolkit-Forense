@@ -36,6 +36,10 @@ docker run --rm \
 
 La imagen ejecuta la utilidad como usuario sin privilegios. La salida JSON se escribe en stdout.
 
+## Publicación de la demo
+
+La demo está preparada en `docs/index.html` y utiliza únicamente datos ficticios. Para publicarla, activa GitHub Pages en **Settings → Pages → Build and deployment → Source → GitHub Actions** y crea la variable de repositorio `ENABLE_PAGES=true` en **Settings → Secrets and variables → Actions → Variables**. El workflow no se ejecuta hasta que Pages esté configurado.
+
 ## Consideraciones forenses
 
 - Trabaja sobre copias verificadas, no sobre la evidencia original.
