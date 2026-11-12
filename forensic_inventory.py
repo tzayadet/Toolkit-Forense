@@ -9,7 +9,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import os
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -41,8 +40,10 @@ def scan_dir(root: Path, extension: str | None = None) -> list[dict]:
             path.resolve(strict=True).relative_to(root)
         except (OSError, ValueError):
             continue
-        if extension and path.suffix.lower() != extension.lower().lstrip(".") and path.suffix.lower() != "." + extension.lower().lstrip("."):
-            continue
+        if extension:
+            expected_suffix = "." + extension.lower().lstrip(".")
+            if path.suffix.lower() != expected_suffix:
+                continue
         try:
             stat = path.stat()
             records.append({
