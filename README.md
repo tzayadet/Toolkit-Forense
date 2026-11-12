@@ -1,67 +1,66 @@
-<p align="center">
-  <img src="https://img.shields.io/badge/DIGITAL_FORENSICS-FILE_INTEGRITY-101010?style=for-the-badge&labelColor=050805&color=00FF41" alt="Forensic File Integrity"/>
-  <img src="https://img.shields.io/badge/PYTHON-CLI-101010?style=for-the-badge&logo=python&logoColor=00FF41" alt="Python CLI"/>
-</p>
+# Forensic File Inventory
 
-# Forensic File Integrity
-
-Inventario técnico de archivos para copias de trabajo forense. Recorre un directorio, calcula hashes SHA-256 y registra tamaño y fecha de modificación en UTC. Sin dependencias externas y con salida JSON.
+A Python utility for creating structured inventories of files in forensic working copies. It records file paths, sizes and modification timestamps, calculates SHA-256 hashes, and exports results as JSON.
 
 <p align="center">
-  <a href="https://tzayadet.github.io/Toolkit-Forense/"><strong>LIVE SHOWCASE ↗</strong></a> ·
-  <a href="https://github.com/tzayadet/Toolkit-Forense"><strong>SOURCE CODE</strong></a>
+  <a href="https://github.com/tzayadet/Toolkit-Forense"><img src="https://img.shields.io/badge/SOURCE-GITHUB-161b22?style=flat-square&logo=github" alt="Source code"></a>
+  <a href="docs/index.html"><img src="https://img.shields.io/badge/SHOWCASE-SOURCE-00a86b?style=flat-square" alt="Showcase source"></a>
 </p>
 
 [![Python tests](https://github.com/tzayadet/Toolkit-Forense/actions/workflows/tests.yml/badge.svg)](https://github.com/tzayadet/Toolkit-Forense/actions/workflows/tests.yml) · [![Container build](https://github.com/tzayadet/Toolkit-Forense/actions/workflows/container-build.yml/badge.svg)](https://github.com/tzayadet/Toolkit-Forense/actions/workflows/container-build.yml)
 
-> El showcase utiliza datos ficticios. El inventario real se ejecuta localmente; la página no procesa evidencias.
-
 ## What it does
 
-- Recorre directorios y registra archivos.
-- Calcula SHA-256 por archivo.
-- Recoge tamaño y fecha de modificación en UTC.
-- Permite filtrar por extensión.
-- Registra errores de lectura por archivo.
-- Excluye enlaces simbólicos para no seguir rutas fuera de la copia seleccionada.
+- Recursively inventories files in a selected directory.
+- Calculates a SHA-256 hash for each readable file.
+- Records file size and modification time in UTC.
+- Supports extension-based filtering.
+- Captures per-file read errors without silently dropping them.
+- Skips symbolic links to avoid following paths outside the selected working copy.
 
-## Quick start
+## Run locally
 
-**Requirements:** Python 3.10+. No external dependencies.
+**Requirements:** Python 3.10 or later. No third-party Python packages are required.
 
 ```bash
 python forensic_inventory.py /path/to/evidence-copy
 python forensic_inventory.py /path/to/evidence-copy --ext pdf
 ```
 
-**Docker**
+## Docker
 
 ```bash
-docker build -t forensic-file-integrity .
-docker run --rm -v "/path/to/evidence-copy:/evidence:ro" forensic-file-integrity /evidence
+docker build -t forensic-file-inventory .
+docker run --rm -v "/path/to/evidence-copy:/evidence:ro" forensic-file-inventory /evidence
 ```
 
-La salida JSON se escribe en stdout. El contenedor ejecuta la utilidad sin privilegios y permite montar la copia en modo solo lectura.
+The container runs the inventory against a read-only mount. JSON results are written to standard output.
 
-## Project layout
+## Project structure
 
 | Path | Purpose |
 |---|---|
-| `forensic_inventory.py` | Inventario y cálculo de hashes |
-| `docs/` | Showcase estático con datos de ejemplo |
-| `tests/` | Pruebas automatizadas |
-| `.github/workflows/` | CI, build de contenedor y Pages |
+| `forensic_inventory.py` | File inventory and SHA-256 calculation |
+| `docs/` | Static showcase with synthetic data |
+| `tests/` | Automated tests |
+| `.github/workflows/` | CI, container build and Pages workflow |
+
+## Showcase
+
+The showcase source is available in [docs/index.html](docs/index.html). Its records are illustrative; the page does not access local files or process evidence. GitHub Pages is not currently confirmed as published for this repository.
 
 ## Forensic considerations
 
-Trabaja sobre copias verificadas, no sobre la evidencia original. Documenta adquisición, custodios, fechas, herramientas y versiones. Un hash permite comparar integridad frente a una referencia, pero no acredita por sí solo autenticidad ni cadena de custodia. Los metadatos de modificación dependen del sistema de archivos y no deben tratarse como fechas probatorias.
+Work on verified copies, not original evidence. Record acquisition details, custodians, timestamps, tool versions and handling procedures separately. A hash can help establish that a file has not changed relative to a trusted reference; by itself, it does not prove authenticity or establish chain of custody.
 
-Esta utilidad no realiza adquisición forense, bloqueo de escritura ni preservación de cadena de custodia.
+This utility does not acquire evidence, enforce write blocking or provide a chain-of-custody system. Filesystem timestamps may also reflect copying or filesystem behaviour rather than the time an event occurred.
 
-## Deployment
+## Tests
 
-GitHub Pages publica el contenido de `docs/` mediante `.github/workflows/pages.yml`. Requiere configurar Pages con GitHub Actions y establecer la variable `ENABLE_PAGES=true`.
+```bash
+python -m pytest
+```
 
 ## License
 
-See [LICENSE](LICENSE).
+See [LICENSE](LICENSE) for the repository's licensing terms.
