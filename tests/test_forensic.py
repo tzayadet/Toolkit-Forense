@@ -1,6 +1,8 @@
 import hashlib
 import tempfile
 import unittest
+from types import SimpleNamespace
+from unittest.mock import patch
 from pathlib import Path
 
 from forensic_inventory import hash_file, scan_dir
@@ -38,6 +40,34 @@ class ForensicTests(unittest.TestCase):
 
             with self.assertRaisesRegex(ValueError, "symbolic link"):
                 hash_file(link)
+
+    @patch("forensic_inventory.os.fstat")
+    def test_hash_file_discards_digest_if_file_changes_during_read(self, mocked_fstat):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "changing.bin"
+            path.write_bytes(b"evidence")
+            stable = SimpleNamespace(
+                st_dev=1, st_ino=2, st_size=8, st_mtime_ns=100, st_ctime_ns=100
+            )
+            changed = SimpleNamespace(
+                st_dev=1, st_ino=2, st_size=9, st_mtime_ns=200, st_ctime_ns=200
+            )
+            mocked_fstat.side_effect = [stable, changed]
+
+            with self.assertRaisesRegex(OSError, "changed while hashing"):
+                hash_file(path)
+
+    @patch("forensic_inventory.hash_file", side_effect=OSError("simulated read failure"))
+    def test_scan_records_hashing_errors_without_aborting(self, _hash_file):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "evidence.bin").write_bytes(b"evidence")
+
+            records = scan_dir(root)
+
+            self.assertEqual(len(records), 1)
+            self.assertIn("error", records[0])
+            self.assertIn("simulated read failure", records[0]["error"])
 
     def test_scan_skips_symbolic_links(self):
         with tempfile.TemporaryDirectory() as tmp:
