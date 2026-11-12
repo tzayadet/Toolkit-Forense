@@ -51,7 +51,7 @@ The showcase source is available in [docs/index.html](docs/index.html). Its reco
 
 ## Forensic considerations
 
-Work on verified copies, not original evidence. Record acquisition details, custodians, timestamps, tool versions and handling procedures separately. A hash can help establish that a file has not changed relative to a trusted reference; by itself, it does not prove authenticity or establish chain of custody.
+Work on verified copies, not original evidence. Record acquisition details, custodians, timestamps, tool versions and handling procedures separately. A hash can help establish that a file has not changed relative to a trusted reference; by itself, it does not prove authenticity or establish chain of custody. The tool checks for changes during hashing, but it is not a substitute for write-blocking or a forensic acquisition process.
 
 This utility does not acquire evidence, enforce write blocking or provide a chain-of-custody system. Filesystem timestamps may also reflect copying or filesystem behaviour rather than the time an event occurred.
 
