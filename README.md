@@ -1,60 +1,67 @@
+<p align="center">
+  <img src="https://img.shields.io/badge/DIGITAL_FORENSICS-FILE_INTEGRITY-101010?style=for-the-badge&labelColor=050805&color=00FF41" alt="Forensic File Integrity"/>
+  <img src="https://img.shields.io/badge/PYTHON-CLI-101010?style=for-the-badge&logo=python&logoColor=00FF41" alt="Python CLI"/>
+</p>
+
 # Forensic File Integrity
 
-Utilidad de inventario de archivos para análisis técnico: recorre un directorio, calcula SHA-256 y registra tamaño y fecha de modificación en UTC.
+Inventario técnico de archivos para copias de trabajo forense. Recorre un directorio, calcula hashes SHA-256 y registra tamaño y fecha de modificación en UTC. Sin dependencias externas y con salida JSON.
+
+<p align="center">
+  <a href="https://tzayadet.github.io/Toolkit-Forense/"><strong>LIVE SHOWCASE ↗</strong></a> ·
+  <a href="https://github.com/tzayadet/Toolkit-Forense"><strong>SOURCE CODE</strong></a>
+</p>
 
 [![Python tests](https://github.com/tzayadet/Toolkit-Forense/actions/workflows/tests.yml/badge.svg)](https://github.com/tzayadet/Toolkit-Forense/actions/workflows/tests.yml) · [![Container build](https://github.com/tzayadet/Toolkit-Forense/actions/workflows/container-build.yml/badge.svg)](https://github.com/tzayadet/Toolkit-Forense/actions/workflows/container-build.yml)
 
-## Requisitos
+> El showcase utiliza datos ficticios. El inventario real se ejecuta localmente; la página no procesa evidencias.
 
-- Python 3.10 o superior.
-- Sin dependencias externas.
+## What it does
 
-## Uso local
+- Recorre directorios y registra archivos.
+- Calcula SHA-256 por archivo.
+- Recoge tamaño y fecha de modificación en UTC.
+- Permite filtrar por extensión.
+- Registra errores de lectura por archivo.
+- Excluye enlaces simbólicos para no seguir rutas fuera de la copia seleccionada.
 
-```bash
-python forensic_inventory.py /ruta/a/la/copia-forense
-python forensic_inventory.py /ruta/a/la/copia-forense --ext pdf
-```
+## Quick start
 
-La salida se genera en JSON e incluye la ruta, el tamaño, la fecha de modificación UTC y el hash SHA-256. Los errores de lectura se registran por archivo. Se excluyen enlaces simbólicos para evitar seguir rutas que salgan de la copia seleccionada.
-
-## Docker
-
-Construye la imagen:
+**Requirements:** Python 3.10+. No external dependencies.
 
 ```bash
-docker build -t forensic-toolkit .
+python forensic_inventory.py /path/to/evidence-copy
+python forensic_inventory.py /path/to/evidence-copy --ext pdf
 ```
 
-Monta la copia de trabajo en modo solo lectura:
+**Docker**
 
 ```bash
-docker run --rm \
-  -v "/ruta/a/la/copia-forense:/evidence:ro" \
-  forensic-toolkit /evidence
+docker build -t forensic-file-integrity .
+docker run --rm -v "/path/to/evidence-copy:/evidence:ro" forensic-file-integrity /evidence
 ```
 
-La imagen ejecuta la utilidad como usuario sin privilegios. La salida JSON se escribe en stdout.
+La salida JSON se escribe en stdout. El contenedor ejecuta la utilidad sin privilegios y permite montar la copia en modo solo lectura.
 
-## Publicar el showcase
+## Project layout
 
-La demo estática está en [docs/index.html](docs/index.html) y utiliza únicamente datos ficticios. Para publicarla:
+| Path | Purpose |
+|---|---|
+| `forensic_inventory.py` | Inventario y cálculo de hashes |
+| `docs/` | Showcase estático con datos de ejemplo |
+| `tests/` | Pruebas automatizadas |
+| `.github/workflows/` | CI, build de contenedor y Pages |
 
-1. En **Settings → Pages**, selecciona **GitHub Actions** como origen.
-2. En **Settings → Secrets and variables → Actions → Variables**, crea `ENABLE_PAGES` con valor `true`.
-3. Ejecuta **Deploy Toolkit-Forense showcase to GitHub Pages** desde Actions.
+## Forensic considerations
 
-La página no procesa evidencias. El CLI inventaría archivos y calcula SHA-256; no realiza adquisición forense ni establece cadena de custodia.
+Trabaja sobre copias verificadas, no sobre la evidencia original. Documenta adquisición, custodios, fechas, herramientas y versiones. Un hash permite comparar integridad frente a una referencia, pero no acredita por sí solo autenticidad ni cadena de custodia. Los metadatos de modificación dependen del sistema de archivos y no deben tratarse como fechas probatorias.
 
-## Consideraciones forenses
+Esta utilidad no realiza adquisición forense, bloqueo de escritura ni preservación de cadena de custodia.
 
-- Trabaja sobre copias verificadas, no sobre la evidencia original.
-- Monta los soportes en modo solo lectura cuando sea posible.
-- Documenta adquisición, custodios, fechas, herramientas y versiones.
-- Este script no realiza adquisición forense, bloqueo de escritura ni preservación de cadena de custodia.
-- Los metadatos de modificación dependen del sistema de archivos y no se incluyen como fecha probatoria.
-- Un hash permite comprobar integridad respecto a una referencia, pero no acredita por sí solo la autenticidad ni la cadena de custodia.
+## Deployment
 
-## Licencia
+GitHub Pages publica el contenido de `docs/` mediante `.github/workflows/pages.yml`. Requiere configurar Pages con GitHub Actions y establecer la variable `ENABLE_PAGES=true`.
 
-Consulta [LICENSE](LICENSE).
+## License
+
+See [LICENSE](LICENSE).
