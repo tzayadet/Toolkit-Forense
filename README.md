@@ -46,3 +46,10 @@ La imagen ejecuta la utilidad como usuario sin privilegios. La salida JSON se es
 ## Licencia
 
 Consulta [LICENSE](LICENSE).
+
+
+## Project showcase
+
+Static overview with a fictional inventory record: https://tzayadet.github.io/Toolkit-Forense/
+
+The page does not process evidence. The CLI inventories files and calculates SHA-256 hashes; it does not acquire evidence or establish chain of custody.
