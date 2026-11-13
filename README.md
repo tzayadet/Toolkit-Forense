@@ -55,7 +55,7 @@ Use a verified working copy and mount it read-only.
 
 ## Showcase
 
-The [showcase source](docs/index.html) contains illustrative records only. It does not access local files or process evidence. GitHub Pages deployment is configured, but Pages must be enabled in repository settings with GitHub Actions as the source before a public URL can be confirmed.
+The [showcase source](docs/index.html) contains illustrative records only. It does not access local files or process evidence. To publish the showcase, enable GitHub Pages with GitHub Actions as its source and set the repository variable `ENABLE_PAGES` to `true`. Until then, the deployment job is intentionally skipped.
 
 ## Validation
 
