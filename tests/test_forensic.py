@@ -27,6 +27,11 @@ class ForensicTests(unittest.TestCase):
             self.assertEqual(len(records), 2)
             self.assertTrue(all("sha256" in record for record in records))
             self.assertTrue(all("modified_utc" in record for record in records))
+            self.assertEqual(
+                {record["path"] for record in records},
+                {"one.txt", "two.pdf"},
+            )
+            self.assertTrue(all(not Path(record["path"]).is_absolute() for record in records))
 
     def test_hash_file_rejects_symbolic_links(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -79,6 +84,19 @@ class ForensicTests(unittest.TestCase):
                 self.skipTest("Symbolic links are not available in this environment")
 
             self.assertEqual(scan_dir(root), [])
+
+    def test_scan_rejects_symbolic_link_root(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "evidence"
+            root.mkdir()
+            link = Path(tmp) / "evidence-link"
+            try:
+                link.symlink_to(root, target_is_directory=True)
+            except (OSError, NotImplementedError):
+                self.skipTest("Symbolic links are not available in this environment")
+
+            with self.assertRaisesRegex(ValueError, "symbolic link"):
+                scan_dir(link)
 
     def test_extension_filter_is_applied(self):
         with tempfile.TemporaryDirectory() as tmp:
