@@ -8,7 +8,7 @@
 A Python utility for creating structured inventories of files in forensic working copies. It records relative paths, file sizes and modification timestamps, calculates SHA-256 hashes, and exports JSON.
 
 <p align="center">
-  <a href="https://github.com/tzayadet/Toolkit-Forense/blob/main/docs/index.html"><strong>SHOWCASE SOURCE ↗</strong></a> ·
+  <a href="https://tzayadet.github.io/Toolkit-Forense/"><strong>LIVE DEMO ↗</strong></a> ·
   <a href="https://github.com/tzayadet/Toolkit-Forense"><strong>SOURCE CODE</strong></a>
 </p>
 
@@ -55,7 +55,7 @@ Use a verified working copy and mount it read-only.
 
 ## Showcase
 
-The [showcase source](docs/index.html) contains illustrative records only. It does not access local files or process evidence. To publish the showcase, enable GitHub Pages with GitHub Actions as its source and set the repository variable `ENABLE_PAGES` to `true`. Until then, the deployment job is intentionally skipped.
+The [showcase source](docs/index.html) contains illustrative records only. It does not access local files or process evidence. The showcase is published separately from the local tool. It is a static demonstration and does not execute the application.
 
 ## Validation
 
