@@ -61,13 +61,17 @@ def scan_dir(root: Path, extension: str | None = None) -> list[dict]:
             if identity_before != identity_after:
                 raise OSError("File changed during inventory; record discarded")
             records.append({
-                "path": str(path),
+                # Relative paths keep reports portable and avoid exposing local usernames.
+                "path": path.relative_to(root).as_posix(),
                 "size": stat_after.st_size,
                 "modified_utc": datetime.fromtimestamp(stat_after.st_mtime, timezone.utc).isoformat(),
                 "sha256": digest,
             })
         except OSError as exc:
-            records.append({"path": str(path), "error": f"{type(exc).__name__}: {exc}"})
+            records.append({
+                "path": path.relative_to(root).as_posix(),
+                "error": f"{type(exc).__name__}: {exc}",
+            })
     return records
 
 
