@@ -1,31 +1,39 @@
-# Forensic File Inventory
-
-A Python utility for creating structured inventories of files in forensic working copies. It records file paths, sizes and modification timestamps, calculates SHA-256 hashes, and exports results as JSON.
-
 <p align="center">
-  <a href="https://github.com/tzayadet/Toolkit-Forense"><img src="https://img.shields.io/badge/SOURCE-GITHUB-161b22?style=flat-square&logo=github" alt="Source code"></a>
-  <a href="docs/index.html"><img src="https://img.shields.io/badge/SHOWCASE-SOURCE-00a86b?style=flat-square" alt="Showcase source"></a>
+  <img src="https://img.shields.io/badge/DFIR-FORENSIC_FILE_INVENTORY-101010?style=for-the-badge&labelColor=050805&color=00FF41" alt="Forensic File Inventory"/>
+  <img src="https://img.shields.io/badge/PYTHON-SHA--256-101010?style=for-the-badge&labelColor=050805&logo=python&logoColor=00FF41" alt="Python SHA-256"/>
 </p>
 
-[![Python tests](https://github.com/tzayadet/Toolkit-Forense/actions/workflows/tests.yml/badge.svg)](https://github.com/tzayadet/Toolkit-Forense/actions/workflows/tests.yml) · [![Container build](https://github.com/tzayadet/Toolkit-Forense/actions/workflows/container-build.yml/badge.svg)](https://github.com/tzayadet/Toolkit-Forense/actions/workflows/container-build.yml)
+# Forensic File Inventory
 
-## What it does
+A Python utility for creating structured inventories of files in forensic working copies. It records relative paths, file sizes and modification timestamps, calculates SHA-256 hashes, and exports JSON.
+
+<p align="center">
+  <a href="https://github.com/tzayadet/Toolkit-Forense/blob/main/docs/index.html"><strong>SHOWCASE SOURCE ↗</strong></a> ·
+  <a href="https://github.com/tzayadet/Toolkit-Forense"><strong>SOURCE CODE</strong></a>
+</p>
+
+[![Python tests](https://github.com/tzayadet/Toolkit-Forense/actions/workflows/tests.yml/badge.svg)](https://github.com/tzayadet/Toolkit-Forense/actions/workflows/tests.yml) · [![Container build](https://github.com/tzayadet/Toolkit-Forense/actions/workflows/container-build.yml/badge.svg)](https://github.com/tzayadet/Toolkit-Forense/actions/workflows/container-build.yml) · [![Pages](https://github.com/tzayadet/Toolkit-Forense/actions/workflows/pages.yml/badge.svg)](https://github.com/tzayadet/Toolkit-Forense/actions/workflows/pages.yml)
+
+## Overview
 
 - Recursively inventories files in a selected directory.
-- Calculates a SHA-256 hash for each readable file.
+- Calculates a SHA-256 digest for each readable file.
 - Records file size and modification time in UTC.
 - Supports extension-based filtering.
-- Captures per-file read errors without silently dropping them.
-- Skips symbolic links to avoid following paths outside the selected working copy.
+- Reports per-file read and hashing errors.
+- Skips symbolic links and uses relative paths in reports.
+- Detects file metadata changes during hashing and discards unstable digests.
 
 ## Run locally
 
-**Requirements:** Python 3.10 or later. No third-party Python packages are required.
+**Requirements:** Python 3.10+. No third-party Python packages are required.
 
 ```bash
 python forensic_inventory.py /path/to/evidence-copy
 python forensic_inventory.py /path/to/evidence-copy --ext pdf
 ```
+
+The JSON inventory is written to standard output.
 
 ## Docker
 
@@ -34,33 +42,37 @@ docker build -t forensic-file-inventory .
 docker run --rm -v "/path/to/evidence-copy:/evidence:ro" forensic-file-inventory /evidence
 ```
 
-The container runs the inventory against a read-only mount. JSON results are written to standard output.
+Use a verified working copy and mount it read-only.
 
 ## Project structure
 
 | Path | Purpose |
 |---|---|
 | `forensic_inventory.py` | File inventory and SHA-256 calculation |
-| `docs/` | Static showcase with synthetic data |
-| `tests/` | Automated tests |
-| `.github/workflows/` | CI, container build and Pages workflow |
+| `docs/` | Static showcase with synthetic records |
+| `tests/` | Automated regression tests |
+| `.github/workflows/` | Test, container and Pages automation |
 
 ## Showcase
 
-The showcase source is available in [docs/index.html](docs/index.html). Its records are illustrative; the page does not access local files or process evidence. The deployment workflow is ready; GitHub Pages must first be enabled in repository settings with GitHub Actions as the source.
+The [showcase source](docs/index.html) contains illustrative records only. It does not access local files or process evidence. GitHub Pages deployment is configured, but Pages must be enabled in repository settings with GitHub Actions as the source before a public URL can be confirmed.
+
+## Validation
+
+Run the tests with:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+GitHub Actions runs the unit tests and container build.
 
 ## Forensic considerations
 
-Work on verified copies, not original evidence. Record acquisition details, custodians, timestamps, tool versions and handling procedures separately. A hash can help establish that a file has not changed relative to a trusted reference; by itself, it does not prove authenticity or establish chain of custody. The tool checks for changes during hashing, but it is not a substitute for write-blocking or a forensic acquisition process.
+Work on verified copies, not original evidence. Record acquisition details, custodians, timestamps, tool versions and handling procedures separately. A hash can help establish that a file has not changed relative to a trusted reference; by itself, it does not prove authenticity or establish chain of custody.
 
-This utility does not acquire evidence, enforce write blocking or provide a chain-of-custody system. Filesystem timestamps may also reflect copying or filesystem behaviour rather than the time an event occurred.
-
-## Tests
-
-```bash
-python -m pytest
-```
+This utility does not acquire evidence, enforce write blocking or provide a chain-of-custody system. Filesystem timestamps may reflect copying or filesystem behaviour rather than the time an event occurred. Relative paths avoid exposing local machine usernames in reports, but the inventory should still be handled as potentially sensitive case data.
 
 ## License
 
-See [LICENSE](LICENSE) for the repository's licensing terms.
+See [LICENSE](LICENSE).
